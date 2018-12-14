@@ -1,14 +1,51 @@
 {% extends'base.html.twig' %}
+
 {% block body %}
+
     <article>
         <h2>{{ article.title }}</h2>
-        <div class="metadata">Ecrit le {{ article.createdAt | date('d/m/y') }} à {{ article.createdAt | date('H:i') }} dans la catégorie Politique</div>
+        <div class="metadata">Ecrit le {{ article.createdAt | date('d/m/y') }} à {{ article.createdAt | date('H:i') }} dans la catégorie {{ article.category.title }}</div>
         <div class="content">
             <img src="{{ article.image }}" alt="">
             {{ article.content | raw}}
         <hr>
     <p>autre paragraphe</p>
-    </div>
+
     </div>
     </article>
+    {% if app.user %}
+
+    <button type="submit" class="btn btn-success">
+        <a href=" {{ path('blog_edit', { 'id' : article.id }) }}" class="btn btn-success">Edit</a>
+    </button>
+        <button type="submit" class="btn btn-success">
+            <a href=" {{ path('blog_delete', { 'id' : article.id }) }}" class="btn btn-success">Delete</a>
+        </button>
+{% endif %}
+
+    <section id="commentaire">
+        <h1>{{ article.comments | length }} Commentaires</h1>
+        {% for comment in article.comments%}
+        <div class="comment">
+            <div class="row">
+                <div class="col-3">
+                    {{ comment.author  }}(<small>{{ comment.createdAt | date('d/m/y à h:i') }}</small>)
+                </div>
+                <div class="col">
+{{ comment.content | raw }}
+                </div>
+            </div>
+        </div>
+{% endfor %}
+        {% if app.user %}
+        {{ form_start(commentForm) }}
+        {{ form_row(commentForm.author, {'attr':{'placeholder':"votre nom"}}) }}
+        {{ form_row(commentForm.content, {'attr':{'placeholder':"votre commentaire"}}) }}
+        <button type="submit" class="btn btn-success">Commenter</button>
+        {{ form_end(commentForm) }}
+        {% else %}
+<h2>Vous ne pouvez pas commenter si vous n'etes pas connecté</h2>
+            <a href="{{ path('security_login') }}" class="btn btn-primary">Connexion</a>
+        {% endif %}
+    </section>
 {% endblock %}
